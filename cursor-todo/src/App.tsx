@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Todo, FilterType } from './types';
 import TodoInput from './components/TodoInput';
 import TodoList from './components/TodoList';
@@ -9,11 +9,25 @@ function App() {
   const [todos, setTodos] = useLocalStorage<Todo[]>('todos', []);
   const [filter, setFilter] = useState<FilterType>('all');
 
-  const addTodo = (text: string) => {
+  // 既存データの後方互換性を確保：dueDateがないタスクにnullを設定
+  useEffect(() => {
+    const needsUpdate = todos.some((todo) => !('dueDate' in todo));
+    if (needsUpdate) {
+      setTodos(
+        todos.map((todo) => ({
+          ...todo,
+          dueDate: 'dueDate' in todo ? todo.dueDate : null,
+        }))
+      );
+    }
+  }, []);
+
+  const addTodo = (text: string, dueDate: string | null) => {
     const newTodo: Todo = {
       id: Date.now().toString(),
       text,
       completed: false,
+      dueDate,
     };
     setTodos([...todos, newTodo]);
   };

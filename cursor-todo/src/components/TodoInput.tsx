@@ -2,18 +2,20 @@ import React, { useState, FormEvent } from 'react';
 import './TodoInput.css';
 
 interface TodoInputProps {
-  onAddTodo: (text: string) => void;
+  onAddTodo: (text: string, dueDate: string | null) => void;
 }
 
 const TodoInput: React.FC<TodoInputProps> = ({ onAddTodo }) => {
   const [inputValue, setInputValue] = useState('');
+  const [dueDate, setDueDate] = useState('');
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmedValue = inputValue.trim();
     if (trimmedValue) {
-      onAddTodo(trimmedValue);
+      onAddTodo(trimmedValue, dueDate || null);
       setInputValue('');
+      setDueDate('');
     }
   };
 
@@ -25,6 +27,12 @@ const TodoInput: React.FC<TodoInputProps> = ({ onAddTodo }) => {
         placeholder="新しいTodoを追加..."
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+      />
+      <input
+        type="date"
+        className="todo-date-input"
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
       />
       <button type="submit" className="todo-add-button">
         追加
